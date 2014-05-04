@@ -29,9 +29,8 @@ public class FrontendController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
-        LoadAccounts();
-        
-        
+        // Initialize the list of available accounts
+        LoadAccounts();                
     }
 
     @FXML
@@ -47,7 +46,10 @@ public class FrontendController implements Initializable {
     private CheckBox siteLevelCheckbox;
         
     
-    
+    /**
+     * 
+     * @param event 
+     */
     @FXML
     private void GenerateReports(ActionEvent event) {
                 
@@ -68,7 +70,10 @@ public class FrontendController implements Initializable {
     
     
     
-    
+    /**
+     * 
+     * @param event 
+     */
     @FXML
     private void FindProjects(ActionEvent event) {
         DropdownData selectedAccount = (DropdownData) accounts.getSelectionModel().getSelectedItem();
@@ -77,7 +82,10 @@ public class FrontendController implements Initializable {
     
     
     
-    
+    /**
+     * 
+     * @param event 
+     */
     @FXML
     private void Close(ActionEvent event) {
         main.app.close();
@@ -85,7 +93,9 @@ public class FrontendController implements Initializable {
 
     
     
-    
+    /**
+     * 
+     */
     private void LoadAccounts() {
 
         ObservableList<DropdownData> accountItems = FXCollections.observableArrayList();
@@ -105,7 +115,10 @@ public class FrontendController implements Initializable {
         accounts.setItems(accountItems);
     }
     
-    
+    /**
+     * 
+     * @param selectedAccount 
+     */
     private void LoadProjects(DropdownData selectedAccount) {
 
         ObservableList<DropdownData> projectItems = FXCollections.observableArrayList();

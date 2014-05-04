@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.grantedsolutions.utilities;
+package com.learnerati.utilities;
 
 import java.io.BufferedWriter;
 import java.io.File;

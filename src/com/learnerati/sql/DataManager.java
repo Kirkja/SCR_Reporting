@@ -1,6 +1,6 @@
-package com.grantedsolutions.sql;
+package com.learnerati.sql;
 
-import com.grantedsolutions.utilities.PropertyManager;
+import com.learnerati.utilities.PropertyManager;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
