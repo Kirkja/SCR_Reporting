@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.collections.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="350.0" prefWidth="640.0" xmlns:fx="http://javafx.com/fxml" fx:controller="com.grantedsolutions.scr_reporter.FrontendController">
+  <children>
+    <MenuBar id="menuBar1" layoutY="-1.0" prefHeight="26.0" prefWidth="646.9999000000025">
+      <menus>
+        <Menu id="fileMenu1" text="File">
+          <items>
+            <MenuItem id="close1" onAction="#Close" text="Close" />
+          </items>
+        </Menu>
+        <Menu id="editMenu1" text="Edit">
+          <items>
+            <MenuItem id="delete1" text="Delete" />
+          </items>
+        </Menu>
+        <Menu id="helpMenu1" text="Help">
+          <items>
+            <MenuItem id="about1" text="About" />
+          </items>
+        </Menu>
+      </menus>
+    </MenuBar>
+    <ComboBox id="comboBox1" fx:id="accounts" layoutX="16.0" layoutY="43.0" onAction="#FindProjects" prefHeight="26.0" prefWidth="271.0" promptText="Accounts available">
+      <items>
+        <FXCollections fx:factory="observableArrayList">
+          <String fx:value="Item 1" />
+          <String fx:value="Item 2" />
+          <String fx:value="Item 3" />
+        </FXCollections>
+      </items>
+    </ComboBox>
+    <ListView id="listView1" fx:id="projects" layoutX="16.0" layoutY="78.0" prefHeight="200.0" prefWidth="271.0" />
+    <CheckBox id="checkBox1" fx:id="projectLevelCheckbox" layoutX="306.0" layoutY="79.0" selected="true" text="Generate project level report">
+      <font>
+        <Font size="12.0" fx:id="x1" />
+      </font>
+    </CheckBox>
+    <CheckBox id="checkBox2" fx:id="siteLevelCheckbox" font="$x1" layoutX="306.0" layoutY="104.0" text="Generate site level reports" />
+    <Button id="button1" fx:id="generateReportsButton" layoutX="478.0" layoutY="302.0" onAction="#GenerateReports" prefHeight="34.0" prefWidth="148.0" text="Generate Reports">
+      <font>
+        <Font name="System Bold" size="14.0" />
+      </font>
+    </Button>
+  </children>
+</AnchorPane>
