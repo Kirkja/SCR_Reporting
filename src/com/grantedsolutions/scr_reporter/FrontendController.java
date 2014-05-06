@@ -5,9 +5,13 @@
  */
 package com.grantedsolutions.scr_reporter;
 
+import com.learnerati.utilities.DocBuilder;
+import com.learnerati.utilities.XMLBase;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,29 +44,59 @@ public class FrontendController implements Initializable {
     private ListView projects;
         
     @FXML
-    private CheckBox projectLevelCheckbox;
+    private CheckBox projectReports;
            
     @FXML
-    private CheckBox siteLevelCheckbox;
+    private CheckBox includeSiteBreakouts;
         
-    
+           
+    @FXML
+    private CheckBox siteReports;
+          
     /**
      * 
      * @param event 
      */
     @FXML
     private void GenerateReports(ActionEvent event) {
-                
-        System.out.printf("\nGenerate Reports: "
-                + "\nAccount: %s"
-                + "\nProject: %s "
-                + "\n\tproject level reporting: %s "
-                + "\n\tite level reporting: %s",
-                accounts.getSelectionModel().getSelectedItem().toString(),
-                projects.getSelectionModel().getSelectedItem().toString(),
-                projectLevelCheckbox.isSelected(),
-                siteLevelCheckbox.isSelected()        
-        );
+         
+        if (!accounts.getSelectionModel().isEmpty() &&
+            !projects.getSelectionModel().isEmpty()) {
+            
+            
+            System.out.printf("\nGenerate Reports: "
+                   + "\nAccount: %s"
+                   + "\nProject: %s "
+                   + "\n\tproject level reporting: %s "
+                   + "\n\tsite level breackouts: %s"
+                   + "\nSite Reports: %s\n",
+                   accounts.getSelectionModel().getSelectedItem().toString(),
+                   projects.getSelectionModel().getSelectedItem().toString(),
+                   projectReports.isSelected(),
+                   includeSiteBreakouts.isSelected(),
+                   siteReports.isSelected()
+           );           
+            
+            Map<String, String> reportParams = new HashMap<>();
+            reportParams.put("accountID", accounts.getSelectionModel().getSelectedItem().toString());
+            reportParams.put("projectID", projects.getSelectionModel().getSelectedItem().toString());
+            reportParams.put("projectReport", projectReports.isSelected() ? "true" : "false");
+            reportParams.put("siteBreakouts", includeSiteBreakouts.isSelected() ? "true" : "false");
+            reportParams.put("siteReports", siteReports.isSelected() ? "true" : "false");
+            
+            XMLBase xmlBase = new XMLBase().Create("document");
+            
+            SCR_report SCR = new SCR_report();
+            SCR.setDocBase(new DocBuilder(xmlBase));
+            SCR.generate(reportParams);
+            
+            
+            
+            
+        }
+        
+        
+
         
         
         
