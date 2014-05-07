@@ -77,17 +77,21 @@ public class FrontendController implements Initializable {
                    siteReports.isSelected()
            );           
             
+            
+            String accountID = ((DropdownData) accounts.getSelectionModel().getSelectedItem()).value.toString();
+            String projectID = ((DropdownData) projects.getSelectionModel().getSelectedItem()).value.toString();
+            
             Map<String, String> reportParams = new HashMap<>();
-            reportParams.put("accountID", accounts.getSelectionModel().getSelectedItem().toString());
-            reportParams.put("projectID", projects.getSelectionModel().getSelectedItem().toString());
+            reportParams.put("accountID", accountID);
+            reportParams.put("projectID", projectID);
             reportParams.put("projectReport", projectReports.isSelected() ? "true" : "false");
             reportParams.put("siteBreakouts", includeSiteBreakouts.isSelected() ? "true" : "false");
             reportParams.put("siteReports", siteReports.isSelected() ? "true" : "false");
             
-            XMLBase xmlBase = new XMLBase().Create("document");
+            //XMLBase xmlBase = new XMLBase().Create("document");
             
             SCR_report SCR = new SCR_report();
-            SCR.setDocBase(new DocBuilder(xmlBase));
+            //SCR.setDocBase(new DocBuilder(xmlBase));
             SCR.generate(reportParams);
             
             
