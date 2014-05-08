@@ -5,6 +5,9 @@
  */
 package com.grantedsolutions.scr_reporter;
 
+import com.grantedsolutions.chart.GridToGLA;
+import com.grantedsolutions.chart.SVGBase;
+import com.learnerati.datameme.DMemeGrid;
 import com.learnerati.sql.DataManager;
 import com.learnerati.utilities.DocBuilder;
 import com.learnerati.utilities.ReadProperties;
@@ -16,6 +19,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 
 /**
@@ -126,8 +130,7 @@ public class SCR_report {
                                 
                 System.out.printf("\n%s\t%s\t%s\t%s", projectName, districtName, siteName, siteID);
                 
-                
-                
+                                
                 Map<String, String> configOptions = new HashMap<>();
                 configOptions.put("base-image-directory",   "c:/GS_ROOT/images/");
                 configOptions.put("base-font-directory",    "c:/GS_ROOT/fonts/");
@@ -136,6 +139,8 @@ public class SCR_report {
                 
                 configOptions.put("chart-directory",     "c:/GS_ROOT/charts/");
                 configOptions.put("table-directory",     "c:/GS_ROOT/tables/");
+                
+                configOptions.put("run-directory",     "c:/GS_ROOT/SCR_RUN/");
 
                 Map<String, String> coverOptions = new HashMap<>();
                 coverOptions.put("title-A", projectName);
@@ -203,7 +208,10 @@ public class SCR_report {
         //Map<String, Element> mainResults = gatherCCSSResults();        
         //section_IV = mainResults.get("data");
         
-        Map<String, Element> results = parseSite(accountID, projectID, siteID);
+        //Map<String, Element> results = parseSite(accountID, projectID, siteID);
+        
+        Map<String, Element> results = parseSite2(accountID, projectID, siteID);
+        
         section_IV = results.get("data");
 
         base.root.appendChild(section_I);
@@ -267,7 +275,7 @@ public class SCR_report {
                     //curGrade.setAttribute("bump", "true");
                     curGrade.appendChild(base.PullExternal(props.getProperty("file.inbase") + "insert_files/grade_filler.txt"));
                     
-                    System.out.println("\tGrade: " + rs.getString("gradeLevel")); 
+                    //System.out.println("\tGrade: " + rs.getString("gradeLevel")); 
                     
                     curGrade.appendChild(
                         base.Base().ImportFragmentString(
@@ -280,7 +288,8 @@ public class SCR_report {
                             )
                         )
                     );   
-                        
+                      
+                    /*
                     curGrade.appendChild(
                         base.Base().ImportFragmentString(
                             createTable(
@@ -291,15 +300,18 @@ public class SCR_report {
                                 , "simple"
                             )
                         )
-                    );                         
+                    ); 
+                    */
                 }  
                 
                 if (curSubject == null) {
                     curSubjectArea = rs.getString("subjectArea");
                     curSubject = base.CreateSection(rs.getString("subjectArea"));
                     curSubject.appendChild(base.PullExternal(props.getProperty("file.inbase") + "insert_files/subject_filler.txt"));
-                    System.out.println("\tSubject: " + rs.getString("subjectArea"));  
+                    //System.out.println("\tSubject: " + rs.getString("subjectArea"));  
                     
+                    
+                    /*
                     curSubject.appendChild(
                         base.Base().ImportFragmentString(
                             createChart(
@@ -310,7 +322,9 @@ public class SCR_report {
                                 , curSubjectArea)
                         )
                     ); 
-                    
+                    */
+                            
+                    /*
                     curSubject.appendChild(
                         base.Base().ImportFragmentString(
                             createTable(
@@ -322,7 +336,7 @@ public class SCR_report {
                             )
                         )
                     );                     
-                    
+                    */
                     
                 }                 
                 
@@ -336,9 +350,11 @@ public class SCR_report {
                     //curSubject.setAttribute("bump", "true");
                     curSubject.appendChild(base.PullExternal(props.getProperty("file.inbase") + "insert_files/subject_filler.txt"));
 
-                    System.out.println("\t\tSubject area: " + rs.getString("subjectArea")); 
-                    System.out.println("\t\t[Generate CR for " + rs.getString("subjectArea")  +"]");
+                    //System.out.println("\t\tSubject area: " + rs.getString("subjectArea")); 
+                    //System.out.println("\t\t[Generate CR for " + rs.getString("subjectArea")  +"]");
                     
+                    
+                    /*
                     curSubject.appendChild(
                         base.Base().ImportFragmentString(
                             createChart(
@@ -349,7 +365,8 @@ public class SCR_report {
                                 , curSubjectArea)
                         )
                     ); 
-                    
+                    */
+                    /*
                     curSubject.appendChild(
                         base.Base().ImportFragmentString(
                             createTable(
@@ -360,20 +377,23 @@ public class SCR_report {
                                 , "detail"                                    
                             )
                         )
-                    );                    
+                    );  
+                    */
                 }
                  
                 
                 if (!curGradeLevel.equals(rs.getString("gradeLevel"))) {
 
+                    // Add to existing grade level section
                     curGrade.appendChild(curSubject);
                     holder.appendChild(curGrade);
                     
+                    // Create a new section for the new grade level
                     curGrade = base.CreateSection("Grade " + rs.getString("gradeLevel"));
                     //curGrade.setAttribute("bump", "true");
                     curGrade.appendChild(base.PullExternal(props.getProperty("file.inbase") + "insert_files/grade_filler.txt"));
 
-                    System.out.println("\tGrade level: " + rs.getString("gradeLevel"));
+                    //System.out.println("\tGrade level: " + rs.getString("gradeLevel"));
                                                            
                     curGrade.appendChild(
                         base.Base().ImportFragmentString(
@@ -386,6 +406,8 @@ public class SCR_report {
                         )
                     ); 
                     
+                    
+                    /*
                     curGrade.appendChild(
                         base.Base().ImportFragmentString(
                             createTable(
@@ -397,7 +419,7 @@ public class SCR_report {
                             )
                         )
                     ); 
-                    
+                    */
                     
                 }               
                 
@@ -456,7 +478,9 @@ public class SCR_report {
                 break;
                 
             case "gla":
-                chartName = "chart_holder_gla.svg";
+                //chartName = "chart_holder_gla.svg";
+                chartName = glaChart(projectID, siteID, gradeLevel);
+                
                 break;
                 
             case "dok-drift":
@@ -520,5 +544,218 @@ public class SCR_report {
     
     
     
+    
+    private String glaChart(
+            String projectID, 
+            String siteID, 
+            String gradeLevel) 
+    {
+        
+        String path = String.format("%s/%s", projectID, siteID);
+        String name = String.format("GLA_%s.svg", gradeLevel);
+        
+        SCR_data data = new SCR_data();
+        
+        DMemeGrid dataGrid = data.getStandardData(projectID, siteID, gradeLevel);
+        
+        dataGrid.setRowDescriptor("Grade Level Drift");
+        dataGrid.setColDescriptor("Collected Subject Areas");
+        
+        //dataGrid.DumpGrid();
+        
+        // define some rules to use for the chart
+        Map<String,Object> rules = new HashMap<>();                
+        rules.put("OutFilePath", path);
+        rules.put("OutFileName", name);
+        rules.put("UseValueData", "true");
+        rules.put("UseCountData", "false");    
+
+        ChartWriter(dataGrid, rules); 
+        
+        
+        //rules.put("OutFileName", "table_a.xml");
+        //TableMaker(dataGrid, rules);        
+        
+        return path +"/"+ name;
+    }
+    
+    
+    private static void ChartWriter(DMemeGrid grid, Map<String, Object> rules) {
+        
+        Map<String, Object> params = new HashMap<>();
+        params.put("vertical-anchor", "top");
+        
+        SVGBase svgb = new SVGBase().Create();
+
+        GridToGLA graph = new GridToGLA(svgb);
+        graph.setRules(rules);        
+        graph.Build(grid);
+
+        graph.ToFile("C:/GS_ROOT/SCR_RUN/" 
+                + rules.get("OutFilePath").toString()
+                , rules.get("OutFileName").toString());        
+    }       
+    
+    
+    
+    //=======================================================================
+    //
+    //
+    
+    private Map<String, Element> parseSite2 (
+              String accountID
+            , String projectID
+            , String siteID) 
+    {
+        
+        Map<String, Element> tmp = new HashMap<>();
+        String curGradeLevel    = "";
+        String curSubjectArea   = "";
+        
+        Element gradeSection    = null;
+        Element subjectSection  = null;        
+        Element holder          = base.CreateSection("School Results");
+                
+        
+        String sqlA = "SELECT \n" +
+            "  BC.gradeLevel \n" +
+            ", BC.subjectArea \n" +
+            "FROM `bank_collector` AS BC \n" +
+            "LEFT JOIN `map_sample_collector` AS MSC ON MSC.collectorID = BC.id \n" +
+            "LEFT JOIN map_collector_site MCS ON MCS.collectorID = MSC.collectorID \n" +
+            "LEFT JOIN map_site_project MSP ON MSP.siteID = MCS.siteID \n" +
+            "LEFT JOIN bank_site AS BS ON BS.id = MSP.siteID\n" +
+            "WHERE BS.active = 'y' \n" +
+            "AND MSP.active = 'y' \n" +
+            "AND MCS.active = 'y' \n" +
+            "AND MSC.active = 'y' \n" +
+            "AND BC.active = 'y' \n" +
+            "AND MSP.projectID 	= " + projectID +"\n" +
+            "AND MSP.siteID     = " + siteID + "\n" +
+            "GROUP BY BS.disname, BS.schname, BC.gradeLevel, BC.subjectArea \n" +
+            "ORDER BY BS.disname, BS.schname, BC.gradeLevel, BC.subjectArea";
+        
+        ResultSet rs = DM.Execute(sqlA);  
+        
+        boolean first = true;
+        String gradeLevel = "";
+        String subjectArea = "";
+        
+        
+        try {
+            rs.beforeFirst();
+
+            while (rs.next()) {
+
+                
+                // Deal with first loop ---------------------------------------
+                if (first) { 
+                   first = false; 
+                   gradeLevel   = rs.getString("gradeLevel").equals("0") ? "K" : rs.getString("gradeLevel");
+                   subjectArea  = rs.getString("subjectArea");
+                   
+                   gradeSection     = base.CreateSection(String.format("Grade - %s", gradeLevel));
+                   subjectSection   = base.CreateSection(String.format("Subject Area - %s", subjectArea));
+                   
+                   // append in the needed content
+                   String title = String.format("Drift: Grade - %s", gradeLevel);
+                   
+                   gradeSection.appendChild(generateGLA(projectID, siteID, gradeLevel, title));
+                   
+                   
+                }
+               
+               
+               
+               
+               // Deal with grade level changes -------------------------------  
+               if (!rs.getString("gradeLevel").equals(gradeLevel)) {
+                   // Append the current subject section to the current grade section
+                   gradeSection.appendChild(subjectSection);
+                   
+                   // Append the current grade section to the holder element
+                   holder.appendChild(gradeSection);
+                   
+                   // Reset the watch variables
+                   gradeLevel   = rs.getString("gradeLevel").equals("0") ? "K" : rs.getString("gradeLevel");
+                   subjectArea  = rs.getString("subjectArea");                   
+                   
+                   // Create new sections
+                   gradeSection     = base.CreateSection(String.format("Grade - %s", gradeLevel));
+                   subjectSection   = base.CreateSection(String.format("Subject Area - %s", subjectArea));                   
+                      
+                   // append in the needed content
+                   String title = String.format("Drift: Grade - %s", gradeLevel);
+                   
+                   gradeSection.appendChild(generateGLA(projectID, siteID, gradeLevel, title));
+                                      
+                   
+               }
+               
+               
+               // Deal with subject area changes ------------------------------
+               if (!rs.getString("subjectArea").equals(subjectArea)) {
+                   // Apend current subject section to current grade section
+                   gradeSection.appendChild(subjectSection);
+                   
+                   // Reset watch variables
+                   subjectArea  = rs.getString("subjectArea");
+                   
+                   // Create new sections
+                   subjectSection   = base.CreateSection(String.format("Subject Area - %s", subjectArea));
+                   
+               }
+                               
+            }   
+            
+            
+            // Append remaining open sections            
+            gradeSection.appendChild(subjectSection);
+            holder.appendChild(gradeSection);
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(SCR_report.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        tmp.put("data", holder);
+        
+        return tmp;
+    }     
+    
+    
+    
+    
+    
+    private DocumentFragment generateGLA(
+            String projectID
+            , String siteID
+            , String gradeLevel
+            , String title) 
+    {
+        
+        //String source = String.format("%s/%s/GLA_%s.svg", projectID, siteID, gradeLevel);
+        
+        
+        String source = glaChart(projectID, siteID, gradeLevel);
+        
+        StringBuilder str = new StringBuilder();
+        
+        str.append("<chart index='true'>");
+        str.append("<title>");
+        str.append(title);
+        str.append("</title>");
+        str.append("<width>100%</width>");
+        str.append("<source>");
+        str.append(source); 
+        str.append("</source>");
+        str.append("<caption>");
+        str.append("Some caption here");
+        str.append("</caption>");
+        str.append("</chart>");        
+                
+        DocumentFragment df = base.base.ImportFragmentString(str.toString());
+                
+        return df;        
+    }
     
 }
