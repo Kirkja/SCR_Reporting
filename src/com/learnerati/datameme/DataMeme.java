@@ -193,6 +193,16 @@ public class DataMeme {
 
         return null;
     }
+    
+    
+    public boolean isNull() {
+        if (_value != null) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
 
     /**
      * Converts the value to a formatted String

@@ -541,13 +541,16 @@ public class DMemeGrid {
      * @return The DataMeme object stored at this location
      */
     public DataMeme getItem(int row, int col) {
-        if (row < Rows()) {
-            if (col < _grid.get(row).size()) {
-                return _grid.get(row).get(col);
-            }
+        
+        if (row > Rows()) {
+            return null;
         }
-
-        return null;
+        
+        if (col > _grid.get(row).size()) {
+            return null;
+        }
+                
+        return _grid.get(row).get(col);        
     }
 
     //-----------------------------------------------------------------------

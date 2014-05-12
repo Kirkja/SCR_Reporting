@@ -160,7 +160,7 @@ public class XMLBase {
     {
         String fullPath  = String.format("%s%s%s", path, File.separatorChar, name);
         
-        System.out.println("Writing: " + fullPath);
+        //System.out.println("Writing: " + fullPath);
         
         try {
             OutputFormat format    = new OutputFormat (doc);

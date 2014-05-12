@@ -32,7 +32,9 @@ public class GridToTable {
     private boolean hasFooter = false;
     
     private Map<Integer, String> _colColors;
+    private Map<String, String> _special;
 
+    
     public GridToTable(XMLBase base)
     {
         doc         = base.doc;
@@ -40,6 +42,7 @@ public class GridToTable {
         this.base   = base;
         
         _colColors  = new HashMap<>();
+        _special    = new HashMap<>();
     }
 
     
@@ -49,6 +52,12 @@ public class GridToTable {
         dataGrid = data;
     }
     
+    
+    public void setSpecial(Map<String, String> items) {
+        _special = items;
+    }
+    
+    /*
     public void Footer(List<String> data)
     {
          hasFooter  = true;         
@@ -83,6 +92,7 @@ public class GridToTable {
         footer.appendChild(s2);                                      
     }    
     
+    */
     
     
     public void ColorColumnLabels(Map<Integer, String> colors)
@@ -96,6 +106,7 @@ public class GridToTable {
     {
         Element title       = doc.createElement("title");
         Element caption     = doc.createElement("coldescriptor");
+                
         Element colHeaders  = CreateColumnHeaders();
         Element rows        = CreateRows();
         
@@ -113,17 +124,26 @@ public class GridToTable {
         }
     }
     
-    public void Index(boolean mode)
+    public void Index(boolean item)
     {
-        root.setAttribute("index", String.format("%s", mode));
+        root.setAttribute("index", String.format("%s", item));
     }
     
-    
+    public void Form(String item)
+    {
+        root.setAttribute("form", String.format("%s", item));
+    }
     
     private Element CreateColumnHeaders()
     {
         Element colHeaders  = doc.createElement("headers");
+        
         Element header      = doc.createElement("col-header");
+
+        if (_special.containsKey("col-header-width")) {
+            header.setAttribute("width", _special.get("col-header-width"));
+        }
+        
         header.appendChild(doc.createTextNode(dataGrid.getRowDescriptor()));
         
         colHeaders.appendChild(header);
@@ -185,19 +205,28 @@ public class GridToTable {
             
             header.appendChild(doc.createTextNode(dataGrid.getRowLabel(rdx)));
             row.appendChild(header);
-                        
+                  
+            
             for (int cdx=0; cdx < dataGrid.Cols(); cdx++)
             {
                 Element item = doc.createElement("col");
-                String str = dataGrid.getItem(rdx, cdx).asText().equals("null") ? "*" : dataGrid.getItem(rdx, cdx).asText();
+
+                String str = dataGrid.getItem(rdx, cdx) == null
+                        ? "*" 
+                        : dataGrid.getItem(rdx, cdx).asText();                                   
+                
                 item.appendChild(doc.createTextNode(str));                
                 row.appendChild(item);
+                
             }
               
             if (dataGrid.getRowSummarys().size() > 0)
             {
                 Element item = doc.createElement("col");
-                String str = dataGrid.getRowSummaryItem(rdx).asText().equals("null") ? "*" : dataGrid.getRowSummaryItem(rdx).asText();
+                String str = dataGrid.getRowSummaryItem(rdx).asText() == null 
+                        ? "*" 
+                        : dataGrid.getRowSummaryItem(rdx).asText();
+                
                 item.appendChild(doc.createTextNode(str));                
                 row.appendChild(item);
             }
@@ -258,6 +287,7 @@ public class GridToTable {
     }
     
     
+    
     private List<String> HumpDivided(String str)
     {        
         String[] tmp = SpaceHump(str).split(" ");
@@ -275,6 +305,13 @@ public class GridToTable {
         base.AsFile(path, name);
     }
 
+    public String AsString() {
+        return base.AsString();
+    }  
+    
+    public String Stripped() {
+        return base.Stripped();
+    }      
     
     
 }

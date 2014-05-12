@@ -37,13 +37,7 @@ public class SCR_data {
     {
         
         DMemeGrid dmg = new DMemeGrid();
-        
-        
-        // Account for grade O being a grade K
-        if (gradeLevel.toUpperCase().equals("K")) {
-            gradeLevel = "0";
-        }
-        
+                       
         //dmg.setLabel("Standards: English Grade 2");
         dmg.setColDescriptor("Collected Content Areas");
         dmg.setRowDescriptor("Drift in Grade Level");   
@@ -168,7 +162,7 @@ public class SCR_data {
                 currentSampleID     = rs.getString("sampleID");
                 currentGroupingID   = rs.getInt("groupingID");               
                 currentGradeLevel   = rs.getInt("gradeLevel");
-                currentSubjectArea  = rs.getString("subjectArea");
+                currentSubjectArea  = reduceSubject(rs.getString("subjectArea"));
             }                        
         } catch (SQLException ex) {
             Logger.getLogger(SCR_data.class.getName()).log(Level.SEVERE, null, ex);
@@ -182,7 +176,22 @@ public class SCR_data {
         return g2;
     }
     
-
+    private String reduceSubject(String str) {
+        String reduced = str;
+        
+        switch (str) {
+            case "Mathematics":
+                reduced = "Math";
+                break;
+                
+            default:
+                reduced = str;
+                break;
+        }
+        
+        return reduced;
+    }
+    
     
     
     private DMemeGrid convertToGridB(Map mp) {
