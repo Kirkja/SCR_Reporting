@@ -169,8 +169,7 @@ public class SCR_data {
         }
         
         DMemeGrid g2 = convertToGridB(sampleB);
-        //g2.DumpGrid();
-        
+        //g2.DumpGrid();        
         //System.out.println("\nTotal = " + total);
         
         return g2;
