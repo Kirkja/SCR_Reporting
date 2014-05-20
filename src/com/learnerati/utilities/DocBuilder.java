@@ -79,10 +79,7 @@ public class DocBuilder {
                 DocumentFragment frag = base.ImportFragmentString(configItem.getValue());
                 item.appendChild(frag);
             }
-
-
-
-
+            
             coverabstract.appendChild(item);
         }
     }

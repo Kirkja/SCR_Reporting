@@ -5,7 +5,9 @@
  */
 package com.grantedsolutions.scr_reporter;
 
+import com.grantedsolutions.chart.GridToChart;
 import com.grantedsolutions.chart.GridToGLA;
+import com.grantedsolutions.chart.GridToRigor;
 import com.grantedsolutions.chart.GridToTable;
 import com.grantedsolutions.chart.SVGBase;
 import com.learnerati.datameme.DMemeGrid;
@@ -144,9 +146,9 @@ public class SCR_report {
                 configOptions.put("base-font-directory",    "c:/GS_ROOT/fonts/");
                 configOptions.put("base-doc-directory",     "c:/GS_ROOT/docs/");
                 configOptions.put("number-of-columns",      "2");                 
-                configOptions.put("chart-directory",     "c:/GS_ROOT/charts/");
-                configOptions.put("table-directory",     "c:/GS_ROOT/tables/");                
-                configOptions.put("run-directory",     "c:/GS_ROOT/SCR_RUN/");
+                configOptions.put("chart-directory",        "c:/GS_ROOT/charts/");
+                configOptions.put("table-directory",        "c:/GS_ROOT/tables/");                
+                configOptions.put("run-directory",          "c:/GS_ROOT/SCR_RUN/");
 
                 Map<String, String> coverOptions = new HashMap<>();
                 coverOptions.put("title-A", projectName);
@@ -176,8 +178,7 @@ public class SCR_report {
                         siteName,
                         siteID
                 );
-                
-                
+                                
                 xmlBase.AsFile("C:/GS_ROOT/xml", siteName + ".xml");
             }
             
@@ -368,7 +369,7 @@ public class SCR_report {
         
         Element gradeSection    = null;
         Element subjectSection  = null;        
-        Element holder          = base.CreateSection("School Results");
+        Element holder          = base.CreateSection("Site Results");
                 
         
         String sqlA = "SELECT \n" +
@@ -450,7 +451,12 @@ public class SCR_report {
                    subjectArea  = rs.getString("subjectArea");
                    
                    // Create new sections
-                   subjectSection   = base.CreateSection(String.format("%s", subjectArea));                   
+                   subjectSection   = base.CreateSection(String.format("%s", subjectArea));
+                   
+                   // append in the needed content
+                   String title = String.format("CR: %s", recoding.GradelevelLabel(gradeLevel));
+                   subjectSection.appendChild(generateRigor(projectID, siteID, gradeLevel, subjectArea, title));
+                   
                }                               
             }   
                         
@@ -469,8 +475,56 @@ public class SCR_report {
     
     
     
+    private DocumentFragment generateRigor(
+            String projectID
+            , String siteID
+            , String gradeLevel
+            , String subjectArea
+            , String title) 
+    {
+    
+        String caption = "";
+        StringBuilder str = new StringBuilder();
+                
+        SCR_data data = new SCR_data();
+        
+        DMemeGrid dataGrid = data.getRigorData(projectID, siteID, gradeLevel, subjectArea);
+        dataGrid.setLabel(title);
+        dataGrid.setRowDescriptor("Cognitive Rigor");
+        dataGrid.setColDescriptor(subjectArea); 
+                
+        String source = crChart(projectID, siteID, gradeLevel, subjectArea, dataGrid);
+        
+        str.append("<chart index='true'>");
+        str.append("<title>");
+        str.append(title);
+        str.append("</title>");
+        str.append("<height>3.00in</height>");
+        str.append("<width>100%</width>");
+        str.append("<source>");
+        str.append(source); 
+        str.append("</source>");
+        str.append("<caption>");
+        str.append(caption);
+        str.append("</caption>");
+        str.append("</chart>");      
+        
+        str.append(glaTable(projectID, siteID, gradeLevel, dataGrid));
+        
+        DocumentFragment df = base.base.ImportFragmentString(str.toString());
+                
+        return df;      
+    }
     
     
+    /**
+     * 
+     * @param projectID
+     * @param siteID
+     * @param gradeLevel
+     * @param title
+     * @return 
+     */
     private DocumentFragment generateGLA(
             String projectID
             , String siteID
@@ -486,8 +540,7 @@ public class SCR_report {
         dataGrid.setLabel(title);
         dataGrid.setRowDescriptor("Grade Level Drift");
         dataGrid.setColDescriptor("Collected Subject Areas"); 
-        
-        
+                
         String source = glaChart(projectID, siteID, gradeLevel, dataGrid);
         
         StringBuilder str = new StringBuilder();
@@ -522,7 +575,7 @@ public class SCR_report {
     {
                 
         String path = String.format("%s/%s", projectID, siteID);
-        String name = String.format("GLA_%s.svg", gradeLevel);
+        String name = String.format("GLA_%s.svg",gradeLevel);
         String root = "C:/GS_ROOT/SCR_RUN/";
                 
         // define some rules to use for the chart
@@ -586,7 +639,23 @@ public class SCR_report {
         graph.ToFile(rules.get("OutRoot").toString()
                 + rules.get("OutFilePath").toString()
                 , rules.get("OutFileName").toString());        
-    }       
+    }   
+    
+    private void ChartWriterCR(DMemeGrid grid, Map<String, Object> rules) {
+        
+        Map<String, Object> params = new HashMap<>();
+        params.put("vertical-anchor", "top");
+        
+        SVGBase svgb = new SVGBase().Create();
+
+        GridToRigor graph = new GridToRigor(svgb);
+        graph.setRules(rules);        
+        graph.Build(grid);
+
+        graph.ToFile(rules.get("OutRoot").toString()
+                + rules.get("OutFilePath").toString()
+                , rules.get("OutFileName").toString());        
+    }      
     
     
     private String TableWriter(DMemeGrid grid, Map<String, Object> rules) {
@@ -608,6 +677,36 @@ public class SCR_report {
         
         
         return table.Stripped();
+    }
+    
+    
+
+    private String crChart(
+            String projectID, 
+            String siteID, 
+            String gradeLevel,
+            String subjectArea,
+            DMemeGrid dataGrid) 
+    {
+                
+        String path = String.format("%s/%s", projectID, siteID);
+        String name = String.format("CR_%s_%s.svg", subjectArea, gradeLevel);
+        String root = "C:/GS_ROOT/SCR_RUN/";
+                
+        // define some rules to use for the chart
+        Map<String,Object> rules = new HashMap<>(); 
+        rules.put("OutRoot", root);
+        rules.put("OutFilePath", path);
+        rules.put("OutFileName", name);
+        rules.put("UseValueData", "true");
+        rules.put("UseCountData", "false");    
+
+        ChartWriterCR(dataGrid, rules); 
+                
+        //rules.put("OutFileName", String.format("GLA_%s_tbl.xml", gradeLevel));
+        //TableWriter(dataGrid, rules);        
+                
+        return path +"/"+ name;
     }
         
     
