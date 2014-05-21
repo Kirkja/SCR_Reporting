@@ -26,8 +26,12 @@ public class GridToRigor {
     private Double _max = Double.MIN_VALUE;
     private Double _total = 0d;
 
-    private final Double horzOffset = 20d;
-    private final Double vertOffset = 1d;
+    private final Double horzOffset = 75d;
+    private final Double vertOffset = 20d;
+    
+    private boolean useRowDescriptor = true;
+    private boolean useColDescriptor = true;
+    
 
     private final int textDrop = 12;
     private final int textBack = 15;
@@ -83,20 +87,41 @@ public class GridToRigor {
         cellgrid.setAttributeNS(null, "opacity", "1"); 
         cellgrid.setAttributeNS(null, "fill", "white"); 
         
+        Element labelContainer = doc.createElementNS(null, "g");
+        labelContainer.setAttributeNS(null, "id", "grid_labels");
+        labelContainer.setAttributeNS(null, "stroke", "black");
+        labelContainer.setAttributeNS(null, "stroke-width", "0.25");        
+        labelContainer.setAttributeNS(null, "opacity", "1");        
         
-        for (int blmIdx = 1; blmIdx <= 6; blmIdx++) {
-            for (int dokIdx = 1; dokIdx <= 4; dokIdx++) {
+        Double maxX     = 0d;
+        Double maxY     = 0d;
+        Double total    = grid.Total();
+        Double max      = grid.Max();
+        
+        base.CheckPoint(maxX, maxY);
+        
+        for (int blmIdx = 0; blmIdx < 6; blmIdx++) {            
+            for (int dokIdx = 0; dokIdx < 4; dokIdx++) {
                 
-                Double X1 = horzOffset + blmIdx * cellWidth;
-                Double Y1 = vertOffset + dokIdx * cellHeight;
+                Double X1 = horzOffset + (blmIdx * cellWidth);
+                Double Y1 = vertOffset + (dokIdx * cellHeight);
+                
+                maxX = X1 > maxX ? X1 : maxX;
+                maxY = Y1 > maxY ? Y1 : maxY;
+                
                 Double op = 0d;
                 
-                if (grid.hasElement(dokIdx-1, blmIdx-1)) {
-                    if (!grid.getItem(dokIdx-1, blmIdx-1).isNull()) {
-                        op = grid.getItem(dokIdx-1, blmIdx-1).asDouble();
+                if (grid.hasElement(dokIdx, blmIdx)) {
+                    if (!grid.getItem(dokIdx, blmIdx).isNull()) {
+                        
+                        op = grid.getItem(dokIdx, blmIdx).asDouble();                        
+                        op = op / max;
                     }
                 }
-
+                
+                styleBase.put("fill", "red");
+                styleBase.put("fill-opacity", String.format("%1.2f", op));
+                
                 cellgrid.appendChild(
                         new ShadedRect(doc).Create(
                                 X1,
@@ -106,16 +131,95 @@ public class GridToRigor {
                                 params,
                                 styleBase
                         )
-                ); 
-                
-                base.CheckPoint(X1, Y1);
-                base.CheckPoint(X1 + cellWidth, Y1 + cellHeight);
-            }
+                );   
+            }                                 
+        }  
+        
+        
+
+        // place the row descriptor -------------------------------------------
+        if (useRowDescriptor) {
+            String str = grid.getRowDescriptor();
+
+            Double x = horzOffset - 55;
+            Double y = vertOffset + (grid.Rows() * cellHeight) / 2 ;
+
+            Element label = doc.createElementNS(null, "text");
+            label.setAttributeNS(null, "text-anchor", "middle");
+            label.setAttributeNS(null, "baseline-shift", "-33%");
+            label.setAttributeNS(null, "transform", String.format("rotate(-90, %d, %d)", x.intValue(), y.intValue()));
+            label.setAttributeNS(null, "stroke", "none");
+            label.setAttributeNS(null, "fill", "black");
+            label.setAttributeNS(null, "font-size", "12pt");
+            label.setAttributeNS(null, "x", x.toString());
+            label.setAttributeNS(null, "y", y.toString());
+            label.appendChild(doc.createTextNode(String.format("%s", str)));
+            labelContainer.appendChild(label);
         }        
+             
+        
+        // place the coldescriptor --------------------------------------------
+        if (useColDescriptor) {
+            
+            Double x = (horzOffset + (grid.Cols() * cellWidth)) / 2d;
+            Double y = vertOffset + (grid.Rows() * cellHeight) + cellHeight*0.8d;
+
+            String str = grid.getColDescriptor();
+
+            Element label = doc.createElementNS(null, "text");
+            label.setAttributeNS(null, "text-anchor", "middle");
+            label.setAttributeNS(null, "stroke", "none");
+            label.setAttributeNS(null, "fill", "black");
+            label.setAttributeNS(null, "font-size", "12pt");
+            label.setAttributeNS(null, "x", x.toString());
+            label.setAttributeNS(null, "y", y.toString());
+            label.appendChild(doc.createTextNode(String.format("%s", str)));
+            labelContainer.appendChild(label);
+            
+            base.CheckPoint(x, y +15);
+        }        
+           
+        
+        for (Double blmIdx = 0d; blmIdx < 6d; blmIdx++) {            
+            Double X1 = horzOffset + (blmIdx * cellWidth);;
+            Double Y1 = vertOffset + (4d * cellHeight) +15d;
+
+            Element label = doc.createElementNS(null, "text");
+            label.setAttributeNS(null, "text-anchor", "middle");
+            label.setAttributeNS(null, "stroke", "none");
+            label.setAttributeNS(null, "fill", "black");
+            label.setAttributeNS(null, "font-size", "12pt");
+            label.setAttributeNS(null, "x", X1.toString());
+            label.setAttributeNS(null, "y", Y1.toString());
+            label.appendChild(doc.createTextNode(String.format("%s", String.format("%d", blmIdx.intValue()+1))));
+            labelContainer.appendChild(label);             
+        }
+        
+        
+        for (Double dokIdx = 0d; dokIdx < 4d; dokIdx++) {
+
+            Double X1 = horzOffset -35d;
+            Double Y1 = vertOffset + ((4d -dokIdx) * cellHeight) - cellHeight/2d +3d;
+
+            Element label = doc.createElementNS(null, "text");
+            label.setAttributeNS(null, "text-anchor", "end");
+            label.setAttributeNS(null, "stroke", "none");
+            label.setAttributeNS(null, "fill", "black");
+            label.setAttributeNS(null, "font-size", "12pt");
+            label.setAttributeNS(null, "x", X1.toString());
+            label.setAttributeNS(null, "y", Y1.toString());
+            label.appendChild(doc.createTextNode(String.format("%s", String.format("%d", dokIdx.intValue()+1))));
+            labelContainer.appendChild(label);                
+        }
+        
+        
+                
+        base.CheckPoint(maxX + cellWidth, maxY + cellHeight);
         
         //-- Append this container
-        root.appendChild(cellgrid);        
-  
+        root.appendChild(cellgrid);
+        root.appendChild(labelContainer);
+        
     }
 
     //=========================================================================

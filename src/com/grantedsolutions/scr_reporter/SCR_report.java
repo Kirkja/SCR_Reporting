@@ -490,8 +490,8 @@ public class SCR_report {
         
         DMemeGrid dataGrid = data.getRigorData(projectID, siteID, gradeLevel, subjectArea);
         dataGrid.setLabel(title);
-        dataGrid.setRowDescriptor("Cognitive Rigor");
-        dataGrid.setColDescriptor(subjectArea); 
+        dataGrid.setRowDescriptor("Depth of Knowledge");
+        dataGrid.setColDescriptor("Bloom's Taxonomy (Revised)"); 
                 
         String source = crChart(projectID, siteID, gradeLevel, subjectArea, dataGrid);
         
@@ -509,7 +509,7 @@ public class SCR_report {
         str.append("</caption>");
         str.append("</chart>");      
         
-        str.append(glaTable(projectID, siteID, gradeLevel, dataGrid));
+        str.append(crTable(projectID, siteID, gradeLevel, subjectArea, dataGrid));
         
         DocumentFragment df = base.base.ImportFragmentString(str.toString());
                 
@@ -621,6 +621,34 @@ public class SCR_report {
                 
         return table;
     }
+    
+    
+    private String crTable(
+            String projectID, 
+            String siteID, 
+            String gradeLevel,
+            String subjectArea,
+            DMemeGrid dataGrid) 
+    {
+        
+        
+        String path = String.format("%s/%s", projectID, siteID);
+        String name = String.format("CR_%s_%S_tbl.xml", gradeLevel, subjectArea);
+        String root = "C:/GS_ROOT/SCR_RUN/";
+                
+        // define some rules to use for the chart
+        Map<String,Object> rules = new HashMap<>(); 
+        rules.put("OutRoot", root);
+        rules.put("OutFilePath", path);
+        rules.put("OutFileName", name);
+        rules.put("UseValueData", "true");
+        rules.put("UseCountData", "false");    
+
+        String table = TableWriter(dataGrid, rules);        
+                
+        return table;
+    }
+    
     
     
     

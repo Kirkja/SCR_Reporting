@@ -145,10 +145,10 @@ public class ShadedRect {
         }
 
         Element elem =  doc.createElement("rect");  
-        elem.setAttribute("x", String.format("%.4f", cx));
-        elem.setAttribute("y", String.format("%.4f", cy));
-        elem.setAttribute("width", String.format("%.4f", w));
-        elem.setAttribute("height", String.format("%.4f", h)); 
+        elem.setAttribute("x", String.format("%.2f", cx));
+        elem.setAttribute("y", String.format("%.2f", cy));
+        elem.setAttribute("width", String.format("%.2f", w));
+        elem.setAttribute("height", String.format("%.2f", h)); 
 
         if (_style != null)
         {
