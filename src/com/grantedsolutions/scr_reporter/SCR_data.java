@@ -67,8 +67,9 @@ public class SCR_data {
                 + "AND MSP.projectID = " + projectID + "\n"
                 + "AND MCSite.siteID = " + siteID + "\n"
                 + "AND BC.gradeLevel = " + gradeLevel + "\n"
-                + //"AND BC.subjectArea = 'Mathematics'\n" +
-                "AND RD.dataName IN ('standard', 'counter')\n"
+                + "AND RD.dataName IN ('standard', 'counter') \n"
+                + "AND RD.dataValue NOT IN ('no standard', 'NIKS') \n"
+                + "AND RD.dataValue IS NOT NULL \n"
                 + "ORDER BY BP.name, BSite.disname, BSite.schname, \n"
                 + "BC.gradeLevel, BC.subjectArea, MSC.sampleID, \n"
                 + "RD.groupingID, RD.dataName, RD.dataValue ";
@@ -103,9 +104,19 @@ public class SCR_data {
                 if (jump == true) {
 
                     String stnd = item.get("standard");
-                    Integer hits = new Integer(item.get("counter"));
+                    String counter = item.get("counter");
+                    
+                    counter = counter == null       ? "0" : counter;
+                    counter = counter.equals("?")   ? "0" : counter;
+                    
+                    System.out.println(stnd);
+                    
+                    if (stnd != null)
+                    { 
+                        
                     String[] sagl = stnd.split("_")[1].split("\\.");
 
+                    Integer hits = counter != null ? new Integer(counter) : 1;
                     total += hits;
 
                     Integer agl = 0;
@@ -130,18 +141,19 @@ public class SCR_data {
                         dmap.put(drift, hits);
                         sampleB.put(currentSubjectArea, dmap);
                     }
-
+                    }
+                    
                     item.clear();
                     jump = false;
                 }
 
                 item.put(rs.getString("dataName"), rs.getString("dataValue"));
 
-                currentCollectorID = rs.getString("collectorID");
-                currentSampleID = rs.getString("sampleID");
-                currentGroupingID = rs.getInt("groupingID");
-                currentGradeLevel = rs.getInt("gradeLevel");
-                currentSubjectArea = reduceSubject(rs.getString("subjectArea"));
+                currentCollectorID  = rs.getString("collectorID");
+                currentSampleID     = rs.getString("sampleID");
+                currentGroupingID   = rs.getInt("groupingID");
+                currentGradeLevel   = rs.getInt("gradeLevel");
+                currentSubjectArea  = reduceSubject(rs.getString("subjectArea"));
             }
         } catch (SQLException ex) {
             Logger.getLogger(SCR_data.class.getName()).log(Level.SEVERE, null, ex);
@@ -237,7 +249,7 @@ public class SCR_data {
                     "LEFT JOIN bank_collector AS BC ON BC.id = MCSite.collectorID\n" +
                     "LEFT JOIN map_sample_collector AS MSC ON MSC.collectorID = MCSite.collectorID\n" +
                     "LEFT JOIN review_data AS RD ON RD.sampleID = MSC.sampleID\n" +
-                    "WHERE MSP.projectID = 23401520791814151\n" +
+                    "WHERE MSP.projectID = " + projectID + " \n" +
                     "AND MSP.active = 'y'\n" +
                     "AND BSite.active = 'y'\n" +
                     "AND MCSite.active = 'y'\n" +
@@ -248,6 +260,7 @@ public class SCR_data {
                     "AND RD.dataValue <> ''\n" +
                     "AND BC.subjectArea = '" + subjectArea + "'\n" +
                     "AND BC.gradeLevel = " + gradeLevel + "\n" +
+                    "AND MSP.siteID = " + siteID + " \n" +
                     "ORDER BY BP.name, BSite.disname, BSite.schname, \n" +
                     "BC.gradeLevel, BC.subjectArea, MSC.sampleID, \n" +
                     "RD.groupingID, RD.dataName, RD.dataValue\n";
@@ -269,7 +282,7 @@ public class SCR_data {
             Map<String, String> item    = new HashMap<>();
             Map<String, Integer> sample = new TreeMap<>();
            
-            dmg.setLabel("Cognitive Rigor: English Grade 2");
+            dmg.setLabel("Cognitive Rigor");
             dmg.setColDescriptor("Bloom's Taxonomy (Revised)");
             dmg.setRowDescriptor("Depth of Knowledge");
 
@@ -283,7 +296,16 @@ public class SCR_data {
             dmg.addColLabel("4");
             dmg.addColLabel("5");
             dmg.addColLabel("6");
-           
+            
+            
+            // build out an empty grid 
+            for (int blmIdx = 0; blmIdx < 6; blmIdx++) {            
+                for (int dokIdx = 0; dokIdx < 4; dokIdx++) {
+                    dmg.addItem(dokIdx, blmIdx, new DataMeme(0));
+                }
+            }
+            
+            
             while (rs.next()) {
 
                 if (currentGroupingID > 0) {
@@ -300,11 +322,24 @@ public class SCR_data {
 
                     String[] rigor = CR.split(":");
                     
+                    //System.out.println(CR);
+                    
+                    if (item.get("dok") != null && item.get("blm") != null)
+                    {                     
                     int dok = new Integer(rigor[0].replace("DOK-", ""));
                     int blm = new Integer(rigor[1].replace("BLM-", ""));
-                                                            
+                      
+                    if (dok > 0 && blm >0)
+                    {
+                        String counter = item.get("counter");
+                        
+                        counter = counter == null       ? "0" : counter;
+                        counter = counter.equals("?")   ? "0" : counter;
+                        
+                        
+                        
                     if (dmg.hasElement(4-dok, blm-1)) {
-                        int c = new Integer(item.get("counter"));
+                        int c = new Integer(counter);
                         
                         int c2 = dmg.getItem(4-dok, blm-1).isNumeric() 
                                 ? dmg.getItem(4-dok, blm-1).asInteger() 
@@ -315,7 +350,8 @@ public class SCR_data {
                     else {
                         dmg.addItem(4-dok, blm-1, new DataMeme(new Integer(item.get("counter"))));
                     }
-                    
+                    }
+                    }
                     item.clear();
                     jump = false;
                 }

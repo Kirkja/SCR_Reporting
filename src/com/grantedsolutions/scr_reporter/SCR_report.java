@@ -410,10 +410,14 @@ public class SCR_report {
                    gradeSection     = base.CreateSection(String.format("%s", recoding.GradelevelLabel(gradeLevel)));
                    subjectSection   = base.CreateSection(String.format("%s", subjectArea));
                    
-                   // append in the needed content
-                   String title = String.format("Drift: %s", recoding.GradelevelLabel(gradeLevel));
-                   
+                   // append in the needed GLA content
+                   String title = String.format("Drift: %s", recoding.GradelevelLabel(gradeLevel));                   
                    gradeSection.appendChild(generateGLA(projectID, siteID, gradeLevel, title));
+                                      
+                   // append in the needed CR content
+                   title = String.format("CR: %s", recoding.GradelevelLabel(gradeLevel));
+                   subjectSection.appendChild(generateRigor(projectID, siteID, gradeLevel, subjectArea, title));
+                                      
                    
                    first = false;                    
                 }
@@ -435,10 +439,15 @@ public class SCR_report {
                    gradeSection     = base.CreateSection(String.format("%s", recoding.GradelevelLabel(gradeLevel)));
                    subjectSection   = base.CreateSection(String.format("%s", subjectArea));                   
                       
-                   // append in the needed content
-                   String title = String.format("Drift: %s", recoding.GradelevelLabel(gradeLevel));
+                   // append in the needed GLA content
+                   String title = String.format("Drift: %s", recoding.GradelevelLabel(gradeLevel));                   
+                   gradeSection.appendChild(generateGLA(projectID, siteID, gradeLevel, title));    
                    
-                   gradeSection.appendChild(generateGLA(projectID, siteID, gradeLevel, title));                                                         
+                   // append in the needed CR content
+                   title = String.format("CR: %s", recoding.GradelevelLabel(gradeLevel));
+                   subjectSection.appendChild(generateRigor(projectID, siteID, gradeLevel, subjectArea, title));
+                                      
+                   
                }
                
                
@@ -500,7 +509,7 @@ public class SCR_report {
         str.append(title);
         str.append("</title>");
         str.append("<height>3.00in</height>");
-        str.append("<width>100%</width>");
+        str.append("<width>75%</width>");
         str.append("<source>");
         str.append(source); 
         str.append("</source>");
@@ -543,6 +552,11 @@ public class SCR_report {
                 
         String source = glaChart(projectID, siteID, gradeLevel, dataGrid);
         
+        
+        int cols = dataGrid.Cols();
+        
+        int percent = 20 * cols;
+        
         StringBuilder str = new StringBuilder();
         
         str.append("<chart index='true'>");
@@ -550,7 +564,9 @@ public class SCR_report {
         str.append(title);
         str.append("</title>");
         str.append("<height>3.00in</height>");
-        str.append("<width>100%</width>");
+        str.append("<width>");
+        str.append(percent);
+        str.append("%</width>");
         str.append("<source>");
         str.append(source); 
         str.append("</source>");

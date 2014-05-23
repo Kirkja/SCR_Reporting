@@ -91,7 +91,15 @@ public class GridToRigor {
         labelContainer.setAttributeNS(null, "id", "grid_labels");
         labelContainer.setAttributeNS(null, "stroke", "black");
         labelContainer.setAttributeNS(null, "stroke-width", "0.25");        
-        labelContainer.setAttributeNS(null, "opacity", "1");        
+        labelContainer.setAttributeNS(null, "opacity", "1"); 
+                
+        
+        Element valueContainer = doc.createElementNS(null, "g");
+        valueContainer.setAttributeNS(null, "id", "grid_values");
+        valueContainer.setAttributeNS(null, "stroke", "black");
+        valueContainer.setAttributeNS(null, "fill", "none");
+        valueContainer.setAttributeNS(null, "stroke-width", "1");        
+        valueContainer.setAttributeNS(null, "opacity", "1");         
         
         Double maxX     = 0d;
         Double maxY     = 0d;
@@ -131,7 +139,33 @@ public class GridToRigor {
                                 params,
                                 styleBase
                         )
-                );   
+                );  
+                
+                
+                String color = op > 0.5d ? "white" : "black";
+                
+                String cellLabel = "";
+                
+                Double d = 100 *op;
+                
+                if (d > 0d) { cellLabel = String.format("%.0f", d); }
+
+                Element childc = doc.createElementNS(null, "text");
+                childc.setAttributeNS(null, "text-anchor", "middle");
+                childc.setAttributeNS(null, "baseline-shift", "-33%");
+                childc.setAttributeNS(null, "stroke", "none");
+                childc.setAttributeNS(null, "fill", color);
+                childc.setAttributeNS(null, "font-size", "10pt");
+                childc.setAttributeNS(null, "x", String.format("%.2f", X1));
+                childc.setAttributeNS(null, "y", String.format("%.2f", Y1 +cellHeight/2d));
+                childc.appendChild(doc.createTextNode(
+                        op > 0d 
+                                ? String.format("%s", cellLabel) + "%"
+                                : String.format("%s", cellLabel)
+                    )
+                );
+                            
+                valueContainer.appendChild(childc);                
             }                                 
         }  
         
@@ -219,6 +253,7 @@ public class GridToRigor {
         //-- Append this container
         root.appendChild(cellgrid);
         root.appendChild(labelContainer);
+        root.appendChild(valueContainer);
         
     }
 
