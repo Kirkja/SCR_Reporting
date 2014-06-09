@@ -555,7 +555,7 @@ public class SCR_report {
         
         int cols = dataGrid.Cols();
         
-        int percent = 20 * cols;
+        int percent = 25 * cols;
         
         StringBuilder str = new StringBuilder();
         

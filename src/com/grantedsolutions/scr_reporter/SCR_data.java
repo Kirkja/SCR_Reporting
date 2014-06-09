@@ -109,7 +109,7 @@ public class SCR_data {
                     counter = counter == null       ? "0" : counter;
                     counter = counter.equals("?")   ? "0" : counter;
                     
-                    System.out.println(stnd);
+                    //System.out.println(stnd);
                     
                     if (stnd != null)
                     { 
@@ -124,7 +124,12 @@ public class SCR_data {
                     if (sagl[0].equals("K")) {
                         ; //
                     } else {
-                        agl = new Integer(sagl[0]);
+                        if (sagl[0].matches("((-|\\+)?[0-9]+(\\.[0-9]+)?)+")) {
+                            agl = new Integer(sagl[0]);   
+                        }
+                        else {
+                            agl = 10; //new Integer(sagl[0]);
+                        }
                     }
 
                     Integer drift = agl - currentGradeLevel;
@@ -335,9 +340,7 @@ public class SCR_data {
                         
                         counter = counter == null       ? "0" : counter;
                         counter = counter.equals("?")   ? "0" : counter;
-                        
-                        
-                        
+                                                                        
                     if (dmg.hasElement(4-dok, blm-1)) {
                         int c = new Integer(counter);
                         
