@@ -146,6 +146,7 @@ public class SCR_data {
                         dmap.put(drift, hits);
                         sampleB.put(currentSubjectArea, dmap);
                     }
+                    
                     }
                     
                     item.clear();
